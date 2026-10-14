@@ -1,0 +1,7 @@
+*.iso
+*.qcow2
+*.img
+*.squashfs
+*.part-*.bin
+private-backup/
+rootfs/
