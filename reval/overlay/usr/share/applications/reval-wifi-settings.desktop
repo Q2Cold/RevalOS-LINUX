@@ -1,0 +1,15 @@
+[Desktop Entry]
+Type=Application
+Name=Wi-Fi
+Name[ru]=Wi-Fi
+Name[kk]=Wi-Fi
+Comment=Manage wireless connections
+Comment[ru]=Управление беспроводными подключениями
+Comment[kk]=Сымсыз қосылымдарды басқару
+Exec=/usr/bin/iwgtk
+TryExec=/usr/bin/iwgtk
+Icon=network-wireless
+Terminal=false
+Categories=Settings;HardwareSettings;X-XFCE-SettingsDialog;
+OnlyShowIn=XFCE;
+StartupNotify=false
