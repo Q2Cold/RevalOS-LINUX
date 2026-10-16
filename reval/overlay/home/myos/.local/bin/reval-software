@@ -11,6 +11,12 @@ import gi
 # Reval OS translations
 TRANSLATIONS = {'Программы Reval OS': ('Reval OS Software', 'Reval OS бағдарламалары'), 'Имя пакета, например: geany, htop, galculator': ('Package name, for example: geany, htop, galculator', 'Пакет атауы, мысалы: geany, htop, galculator'), 'Название пакета': ('Package name', 'Пакет атауы'), 'Готово': ('Ready', 'Дайын'), 'Выполняется…': ('Working…', 'Орындалуда…'), 'Ошибка — смотри вывод ниже': ('Error — see details below', 'Қате — төмендегі мәліметті қараңыз'), 'Установить': ('Install', 'Орнату'), 'Установленные': ('Installed', 'Орнатылған'), 'Удалить': ('Remove', 'Жою'), 'История': ('History', 'Тарих'), 'Откат': ('Roll back', 'Алдыңғы нұсқаға қайтару'), 'Найти': ('Find', 'Іздеу'), 'Программа': ('Application', 'Бағдарлама'), 'Пакет': ('Package', 'Пакет'), 'Описание': ('Description', 'Сипаттама'), 'Каталог программ': ('Application catalog', 'Бағдарламалар каталогы'), 'Закрыть': ('Close', 'Жабу'), 'Выбрать': ('Select', 'Таңдау'), 'Стартовый каталог Reval OS — не весь Nixpkgs': ('Reval OS starter catalog — a selection from Nixpkgs', 'Reval OS бастапқы каталогы — Nixpkgs пакеттерінің бір бөлігі'), 'Например: редактор, Python, процессы': ('For example: editor, Python, processes', 'Мысалы: редактор, Python, процестер'), 'Пакет выбран. Нажми «Установить».': ('Package selected. Click Install.', 'Пакет таңдалды. «Орнату» түймесін басыңыз.'), 'Выбери программу в таблице': ('Select an application in the table', 'Кестеден бағдарламаны таңдаңыз'), 'Введи имя пакета без пробелов, например geany': ('Enter a package name without spaces, for example geany', 'Пакет атауын бос орынсыз енгізіңіз, мысалы geany'), 'Удалить пакет «': ('Remove package “', '«'), '» из профиля Nix?': ('” from your Nix profile?', '» пакетін Nix профилінен жою керек пе?'), 'Вернуть предыдущую версию всего профиля Nix?': ('Restore the previous version of the entire Nix profile?', 'Бүкіл Nix профилінің алдыңғы нұсқасын қалпына келтіру керек пе?'), 'Установлено программ: ': ('Installed applications: ', 'Орнатылған бағдарламалар: '), '\nОперация завершена.\n': ('\nOperation completed.\n', '\nӘрекет аяқталды.\n'), 'Неожиданный формат списка Nix': ('Unexpected Nix list format', 'Nix тізімінің пішімі күтпеген түрде'), 'Редактор кода и небольшая среда разработки': ('Code editor and lightweight IDE', 'Код редакторы және шағын әзірлеу ортасы'), 'Калькулятор': ('Calculator', 'Калькулятор'), 'Просмотр процессов и нагрузки': ('Process and resource monitor', 'Процестер мен жүктемені бақылау'), 'Дерево файлов и каталогов': ('File and directory tree', 'Файлдар мен бумалар ағашы'), 'Управление версиями исходного кода': ('Source code version control', 'Бастапқы код нұсқаларын басқару'), 'Быстрый поиск текста в файлах': ('Fast text search in files', 'Файлдардан мәтінді жылдам іздеу'), 'Обработка данных JSON': ('JSON data processing', 'JSON деректерін өңдеу'), 'Несколько терминалов в одном окне': ('Multiple terminals in one window', 'Бір терезедегі бірнеше терминал'), 'Простой текстовый редактор в терминале': ('Simple terminal text editor', 'Терминалдағы қарапайым мәтін редакторы'), 'Расширяемый редактор кода': ('Extensible code editor', 'Кеңейтілетін код редакторы'), 'Язык программирования Python': ('Python programming language', 'Python бағдарламалау тілі'), 'Среда выполнения JavaScript': ('JavaScript runtime', 'JavaScript орындау ортасы'), 'Компилятор языка Rust': ('Rust compiler', 'Rust компиляторы'), 'Сборка проектов и зависимости Rust': ('Rust builds and dependencies', 'Rust жобаларын құрастыру және тәуелділіктер'), 'Подготовка сборки программ': ('Build configuration', 'Бағдарламаларды құрастыруды баптау'), 'Инструмент сборки Make': ('Make build tool', 'Make құрастыру құралы'), 'Отладчик программ': ('Program debugger', 'Бағдарламаларды жөндеу құралы'), 'Проверка ошибок в shell-скриптах': ('Shell script checking', 'Shell скрипттеріндегі қателерді тексеру'), 'Просмотр системных вызовов программы': ('Trace program system calls', 'Бағдарламаның жүйелік шақыруларын бақылау'), 'Сетевые запросы и загрузка файлов': ('Network requests and downloads', 'Желілік сұраулар және файлдарды жүктеу'), 'Загрузка файлов': ('File downloads', 'Файлдарды жүктеу'), 'Монитор ресурсов в терминале': ('Terminal resource monitor', 'Терминалдағы ресурстар мониторы')}
 
+TRANSLATIONS.update({
+    'Подробности': ('Details', 'Мәліметтер'),
+    'Nix не найден. Запусти магазин внутри Reval OS.': ('Nix was not found. Open this application inside Reval OS.', 'Nix табылмады. Бағдарламаны Reval OS ішінде іске қосыңыз.'),
+    'Дождись завершения операции перед закрытием окна.': ('Wait for the operation to finish before closing.', 'Терезені жаппас бұрын әрекеттің аяқталуын күтіңіз.'),
+})
+
 def tr(message):
     language = (
         os.environ.get("LC_ALL")
@@ -62,7 +68,20 @@ scroll = Gtk.ScrolledWindow()
 scroll.set_hexpand(True)
 scroll.set_vexpand(True)
 scroll.add(view)
-box.pack_start(scroll, True, True, 0)
+details = Gtk.Expander(label=tr("Подробности"))
+scroll.set_size_request(-1, 120)
+details.add(scroll)
+box.pack_start(details, False, True, 0)
+spinner = Gtk.Spinner()
+box.pack_start(spinner, False, False, 0)
+busy = False
+
+def on_close(*_):
+    if busy:
+        status.set_text(tr("Дождись завершения операции перед закрытием окна."))
+    return busy
+
+window.connect("delete-event", on_close)
 
 buttons = []
 
@@ -79,7 +98,7 @@ for index, title in enumerate((tr("Программа"), tr("Пакет"))):
 installed_scroll = Gtk.ScrolledWindow()
 installed_scroll.set_size_request(-1, 170)
 installed_scroll.add(table)
-box.pack_start(installed_scroll, False, True, 0)
+box.pack_start(installed_scroll, True, True, 0)
 box.reorder_child(installed_scroll, 4)
 
 def show_installed(data):
@@ -103,6 +122,11 @@ def append(text):
     return False
 
 def done(code):
+    global busy
+    busy = False
+    spinner.stop()
+    if code != 0:
+        details.set_expanded(True)
     for button in buttons:
         button.set_sensitive(True)
     entry.set_sensitive(True)
@@ -110,6 +134,16 @@ def done(code):
     return False
 
 def execute(args):
+    global busy
+    if busy:
+        return
+    if not (os.path.isfile(nix) and os.access(nix, os.X_OK)):
+        status.set_text(tr("Nix не найден. Запусти магазин внутри Reval OS."))
+        return
+    busy = True
+    spinner.start()
+    if args == ["profile", "history"]:
+        details.set_expanded(True)
     for button in buttons:
         button.set_sensitive(False)
     entry.set_sensitive(False)
@@ -121,25 +155,44 @@ def execute(args):
         try:
             command = [nix, "--extra-experimental-features",
                        "nix-command flakes"] + (args + ["--json"] if args == ["profile", "list"] else args)
-            with subprocess.Popen(
-                command, stdout=subprocess.PIPE,
-                stderr=subprocess.STDOUT, text=True,
-                errors="replace", env=dict(os.environ, NO_COLOR="1", TERM="dumb")
-            ) as process:
-                if args == ["profile", "list"]:
-                    output = process.stdout.read()
-                    code = process.wait()
-                    if code == 0:
-                        data = json.loads(output)
-                        if not isinstance(data.get("elements"), dict):
-                            raise ValueError(tr("Неожиданный формат списка Nix"))
-                        GLib.idle_add(show_installed, data)
-                    else:
-                        GLib.idle_add(append, output)
+            environment = dict(os.environ, NO_COLOR="1", TERM="dumb")
+            if args == ["profile", "list"]:
+                result = subprocess.run(command, capture_output=True, text=True,
+                                        errors="replace", env=environment)
+                code = result.returncode
+                if result.stderr:
+                    GLib.idle_add(append, result.stderr)
+                if code == 0:
+                    data = json.loads(result.stdout)
+                    if not isinstance(data.get("elements"), dict):
+                        raise ValueError(tr("Неожиданный формат списка Nix"))
+                    GLib.idle_add(show_installed, data)
                 else:
+                    GLib.idle_add(append, result.stdout)
+            else:
+                with subprocess.Popen(command, stdout=subprocess.PIPE,
+                                      stderr=subprocess.STDOUT, text=True,
+                                      errors="replace", env=environment) as process:
                     for line in process.stdout:
                         GLib.idle_add(append, line)
                     code = process.wait()
+                if code == 0 and args[:2] in (["profile", "add"],
+                                               ["profile", "remove"],
+                                               ["profile", "rollback"]):
+                    refresh = subprocess.run(
+                        [nix, "--extra-experimental-features", "nix-command flakes",
+                         "profile", "list", "--json"], capture_output=True,
+                        text=True, errors="replace", env=environment)
+                    if refresh.stderr:
+                        GLib.idle_add(append, refresh.stderr)
+                    if refresh.returncode != 0:
+                        GLib.idle_add(append, refresh.stdout)
+                        code = refresh.returncode
+                    else:
+                        data = json.loads(refresh.stdout)
+                        if not isinstance(data.get("elements"), dict):
+                            raise ValueError(tr("Неожиданный формат списка Nix"))
+                        GLib.idle_add(show_installed, data)
             if code == 0:
                 GLib.idle_add(append, tr("\nОперация завершена.\n"))
         except Exception as error:
