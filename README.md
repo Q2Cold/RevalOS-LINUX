@@ -1,6 +1,6 @@
 # Reval OS
 
-Reval OS — экспериментальный Linux-дистрибутив на базе Linux From Scratch.
+Reval — технология, которая не поглощает природу человека, а расцветает вместе с ним.
 
 ## Reval OS 0.2 Universal Preview
 
