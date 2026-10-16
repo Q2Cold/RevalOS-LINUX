@@ -1,0 +1,14 @@
+
+XTerm*faceName: DejaVu Sans Mono
+XTerm*faceSize: 11
+XTerm*background: #182030
+XTerm*foreground: #e6edf3
+XTerm*cursorColor: #7dcfff
+XTerm*saveLines: 10000
+XTerm*scrollBar: false
+
+XTerm*selectToClipboard: true
+XTerm*VT100.translations: #override \n\
+    Ctrl Shift <Key>C: copy-selection(CLIPBOARD) \n\
+    Ctrl Shift <Key>V: insert-selection(CLIPBOARD) \n\
+    Shift <Key>Insert: insert-selection(CLIPBOARD)

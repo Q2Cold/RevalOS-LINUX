@@ -5,3 +5,5 @@
 *.part-*.bin
 private-backup/
 rootfs/
+
+/build/

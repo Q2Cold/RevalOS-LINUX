@@ -1,0 +1,7 @@
+[Desktop Entry]
+Name=Reval OS
+Comment=Рабочий стол Reval OS с Openbox
+Exec=/usr/local/bin/reval-session
+TryExec=/usr/local/bin/reval-session
+Type=Application
+DesktopNames=Openbox;

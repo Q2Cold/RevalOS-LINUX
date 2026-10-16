@@ -1,0 +1,4 @@
+#!/bin/sh
+export XDG_CURRENT_DESKTOP=Openbox
+export XDG_SESSION_DESKTOP=myos
+exec /bin/sh "$HOME/.xinitrc"

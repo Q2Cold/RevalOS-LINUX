@@ -1,0 +1,2 @@
+#!/bin/sh
+feh --no-fehbg --bg-fill '/home/myos/Pictures/5a04798528e14186af57431437fda06f.jpg'

@@ -1,0 +1,10 @@
+[Desktop Entry]
+Type=Application
+Name=Language and Region
+Name[ru]=Язык и регион
+Name[kk]=Тіл және аймақ
+Comment=Configure system language, regional formats and time zone
+Exec=/home/myos/.local/bin/reval-region
+Icon=preferences-desktop-locale
+Terminal=false
+Categories=Settings;DesktopSettings;X-XFCE-SettingsDialog;

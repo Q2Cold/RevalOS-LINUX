@@ -1,0 +1,10 @@
+[Desktop Entry]
+Type=Application
+Name=Reval OS Software
+Name[ru]=Программы Reval OS
+Name[kk]=Reval OS бағдарламалары
+Comment=Install and manage applications with Nix
+Exec=/home/myos/.local/bin/reval-software
+Icon=system-software-install
+Terminal=false
+Categories=Settings;System;

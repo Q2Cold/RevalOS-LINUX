@@ -1,0 +1,296 @@
+#!/usr/bin/python3
+import os
+import json
+import re
+import shutil
+import subprocess
+import threading
+import gi
+
+
+# Reval OS translations
+TRANSLATIONS = {'Программы Reval OS': ('Reval OS Software', 'Reval OS бағдарламалары'), 'Имя пакета, например: geany, htop, galculator': ('Package name, for example: geany, htop, galculator', 'Пакет атауы, мысалы: geany, htop, galculator'), 'Название пакета': ('Package name', 'Пакет атауы'), 'Готово': ('Ready', 'Дайын'), 'Выполняется…': ('Working…', 'Орындалуда…'), 'Ошибка — смотри вывод ниже': ('Error — see details below', 'Қате — төмендегі мәліметті қараңыз'), 'Установить': ('Install', 'Орнату'), 'Установленные': ('Installed', 'Орнатылған'), 'Удалить': ('Remove', 'Жою'), 'История': ('History', 'Тарих'), 'Откат': ('Roll back', 'Алдыңғы нұсқаға қайтару'), 'Найти': ('Find', 'Іздеу'), 'Программа': ('Application', 'Бағдарлама'), 'Пакет': ('Package', 'Пакет'), 'Описание': ('Description', 'Сипаттама'), 'Каталог программ': ('Application catalog', 'Бағдарламалар каталогы'), 'Закрыть': ('Close', 'Жабу'), 'Выбрать': ('Select', 'Таңдау'), 'Стартовый каталог Reval OS — не весь Nixpkgs': ('Reval OS starter catalog — a selection from Nixpkgs', 'Reval OS бастапқы каталогы — Nixpkgs пакеттерінің бір бөлігі'), 'Например: редактор, Python, процессы': ('For example: editor, Python, processes', 'Мысалы: редактор, Python, процестер'), 'Пакет выбран. Нажми «Установить».': ('Package selected. Click Install.', 'Пакет таңдалды. «Орнату» түймесін басыңыз.'), 'Выбери программу в таблице': ('Select an application in the table', 'Кестеден бағдарламаны таңдаңыз'), 'Введи имя пакета без пробелов, например geany': ('Enter a package name without spaces, for example geany', 'Пакет атауын бос орынсыз енгізіңіз, мысалы geany'), 'Удалить пакет «': ('Remove package “', '«'), '» из профиля Nix?': ('” from your Nix profile?', '» пакетін Nix профилінен жою керек пе?'), 'Вернуть предыдущую версию всего профиля Nix?': ('Restore the previous version of the entire Nix profile?', 'Бүкіл Nix профилінің алдыңғы нұсқасын қалпына келтіру керек пе?'), 'Установлено программ: ': ('Installed applications: ', 'Орнатылған бағдарламалар: '), '\nОперация завершена.\n': ('\nOperation completed.\n', '\nӘрекет аяқталды.\n'), 'Неожиданный формат списка Nix': ('Unexpected Nix list format', 'Nix тізімінің пішімі күтпеген түрде'), 'Редактор кода и небольшая среда разработки': ('Code editor and lightweight IDE', 'Код редакторы және шағын әзірлеу ортасы'), 'Калькулятор': ('Calculator', 'Калькулятор'), 'Просмотр процессов и нагрузки': ('Process and resource monitor', 'Процестер мен жүктемені бақылау'), 'Дерево файлов и каталогов': ('File and directory tree', 'Файлдар мен бумалар ағашы'), 'Управление версиями исходного кода': ('Source code version control', 'Бастапқы код нұсқаларын басқару'), 'Быстрый поиск текста в файлах': ('Fast text search in files', 'Файлдардан мәтінді жылдам іздеу'), 'Обработка данных JSON': ('JSON data processing', 'JSON деректерін өңдеу'), 'Несколько терминалов в одном окне': ('Multiple terminals in one window', 'Бір терезедегі бірнеше терминал'), 'Простой текстовый редактор в терминале': ('Simple terminal text editor', 'Терминалдағы қарапайым мәтін редакторы'), 'Расширяемый редактор кода': ('Extensible code editor', 'Кеңейтілетін код редакторы'), 'Язык программирования Python': ('Python programming language', 'Python бағдарламалау тілі'), 'Среда выполнения JavaScript': ('JavaScript runtime', 'JavaScript орындау ортасы'), 'Компилятор языка Rust': ('Rust compiler', 'Rust компиляторы'), 'Сборка проектов и зависимости Rust': ('Rust builds and dependencies', 'Rust жобаларын құрастыру және тәуелділіктер'), 'Подготовка сборки программ': ('Build configuration', 'Бағдарламаларды құрастыруды баптау'), 'Инструмент сборки Make': ('Make build tool', 'Make құрастыру құралы'), 'Отладчик программ': ('Program debugger', 'Бағдарламаларды жөндеу құралы'), 'Проверка ошибок в shell-скриптах': ('Shell script checking', 'Shell скрипттеріндегі қателерді тексеру'), 'Просмотр системных вызовов программы': ('Trace program system calls', 'Бағдарламаның жүйелік шақыруларын бақылау'), 'Сетевые запросы и загрузка файлов': ('Network requests and downloads', 'Желілік сұраулар және файлдарды жүктеу'), 'Загрузка файлов': ('File downloads', 'Файлдарды жүктеу'), 'Монитор ресурсов в терминале': ('Terminal resource monitor', 'Терминалдағы ресурстар мониторы')}
+
+def tr(message):
+    language = (
+        os.environ.get("LC_ALL")
+        or os.environ.get("LC_MESSAGES")
+        or os.environ.get("LANG", "en")
+    ).split("_")[0].split(".")[0].lower()
+    if language == "ru":
+        return message
+    versions = TRANSLATIONS.get(message)
+    if versions is None:
+        return message
+    return versions[1] if language == "kk" else versions[0]
+
+gi.require_version("Gtk", "3.0")
+from gi.repository import Gtk, GLib
+
+nix = shutil.which("nix") or "/nix/var/nix/profiles/default/bin/nix"
+
+window = Gtk.Window(title=tr("Программы Reval OS"))
+window.set_default_size(760, 520)
+window.set_border_width(14)
+window.connect("destroy", Gtk.main_quit)
+
+box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=10)
+window.add(box)
+
+label = Gtk.Label(label=tr("Имя пакета, например: geany, htop, galculator"))
+label.set_halign(Gtk.Align.START)
+box.pack_start(label, False, False, 0)
+
+entry = Gtk.Entry()
+entry.set_placeholder_text(tr("Название пакета"))
+box.pack_start(entry, False, False, 0)
+
+row = Gtk.Box(spacing=8)
+box.pack_start(row, False, False, 0)
+
+status = Gtk.Label(label=tr("Готово"))
+status.set_halign(Gtk.Align.START)
+box.pack_start(status, False, False, 0)
+
+view = Gtk.TextView()
+view.set_editable(False)
+view.set_monospace(True)
+view.set_wrap_mode(Gtk.WrapMode.WORD_CHAR)
+buffer = view.get_buffer()
+
+scroll = Gtk.ScrolledWindow()
+scroll.set_hexpand(True)
+scroll.set_vexpand(True)
+scroll.add(view)
+box.pack_start(scroll, True, True, 0)
+
+buttons = []
+
+# Reval OS installed table
+store = Gtk.ListStore(str, str)
+table = Gtk.TreeView(model=store)
+for index, title in enumerate((tr("Программа"), tr("Пакет"))):
+    column = Gtk.TreeViewColumn(
+        title, Gtk.CellRendererText(), text=index
+    )
+    column.set_resizable(True)
+    table.append_column(column)
+
+installed_scroll = Gtk.ScrolledWindow()
+installed_scroll.set_size_request(-1, 170)
+installed_scroll.add(table)
+box.pack_start(installed_scroll, False, True, 0)
+box.reorder_child(installed_scroll, 4)
+
+def show_installed(data):
+    store.clear()
+    for name, item in sorted(data["elements"].items()):
+        attribute = item.get("attrPath") or ""
+        prefix = "legacyPackages.x86_64-linux."
+        if attribute.startswith(prefix):
+            attribute = attribute[len(prefix):]
+        store.append([name, attribute])
+    append(tr("Установлено программ: ") + str(len(store)) + "\n")
+    return False
+
+def selected_name():
+    model, iterator = table.get_selection().get_selected()
+    return model[iterator][0] if iterator is not None else None
+
+def append(text):
+    text = re.sub(r'\x1b\[[0-?]*[ -/]*[@-~]', '', text)
+    buffer.insert(buffer.get_end_iter(), text)
+    return False
+
+def done(code):
+    for button in buttons:
+        button.set_sensitive(True)
+    entry.set_sensitive(True)
+    status.set_text(tr("Готово") if code == 0 else tr("Ошибка — смотри вывод ниже"))
+    return False
+
+def execute(args):
+    for button in buttons:
+        button.set_sensitive(False)
+    entry.set_sensitive(False)
+    buffer.set_text("")
+    status.set_text(tr("Выполняется…"))
+
+    def worker():
+        code = 1
+        try:
+            command = [nix, "--extra-experimental-features",
+                       "nix-command flakes"] + (args + ["--json"] if args == ["profile", "list"] else args)
+            with subprocess.Popen(
+                command, stdout=subprocess.PIPE,
+                stderr=subprocess.STDOUT, text=True,
+                errors="replace", env=dict(os.environ, NO_COLOR="1", TERM="dumb")
+            ) as process:
+                if args == ["profile", "list"]:
+                    output = process.stdout.read()
+                    code = process.wait()
+                    if code == 0:
+                        data = json.loads(output)
+                        if not isinstance(data.get("elements"), dict):
+                            raise ValueError(tr("Неожиданный формат списка Nix"))
+                        GLib.idle_add(show_installed, data)
+                    else:
+                        GLib.idle_add(append, output)
+                else:
+                    for line in process.stdout:
+                        GLib.idle_add(append, line)
+                    code = process.wait()
+            if code == 0:
+                GLib.idle_add(append, tr("\nОперация завершена.\n"))
+        except Exception as error:
+            code = 1
+            GLib.idle_add(append, str(error) + "\n")
+        finally:
+            GLib.idle_add(done, code)
+
+    threading.Thread(target=worker, daemon=True).start()
+
+def confirm(message):
+    dialog = Gtk.MessageDialog(
+        transient_for=window, modal=True,
+        message_type=Gtk.MessageType.QUESTION,
+        buttons=Gtk.ButtonsType.OK_CANCEL,
+        text=message
+    )
+    answer = dialog.run()
+    dialog.destroy()
+    return answer == Gtk.ResponseType.OK
+
+def package():
+    name = entry.get_text().strip()
+    if not re.fullmatch(r"[A-Za-z0-9_][A-Za-z0-9_.+-]*", name):
+        status.set_text(tr("Введи имя пакета без пробелов, например geany"))
+        return None
+    return name
+
+def install(_):
+    name = package()
+    if name:
+        execute(["profile", "add", "nixpkgs#" + name])
+
+def remove(_):
+    name = selected_name()
+    if not name:
+        status.set_text(tr("Выбери программу в таблице"))
+        return
+    if name and confirm(tr("Удалить пакет «") + name + tr("» из профиля Nix?")):
+        execute(["profile", "remove", name])
+
+def rollback(_):
+    if confirm(tr("Вернуть предыдущую версию всего профиля Nix?")):
+        execute(["profile", "rollback"])
+
+def button(title, callback):
+    widget = Gtk.Button(label=title)
+    widget.connect("clicked", callback)
+    row.pack_start(widget, False, False, 0)
+    buttons.append(widget)
+
+# Reval OS starter catalog
+catalog = [
+    ("geany", tr("Редактор кода и небольшая среда разработки")),
+    ("galculator", tr("Калькулятор")),
+    ("htop", tr("Просмотр процессов и нагрузки")),
+    ("tree", tr("Дерево файлов и каталогов")),
+    ("git", tr("Управление версиями исходного кода")),
+    ("ripgrep", tr("Быстрый поиск текста в файлах")),
+    ("jq", tr("Обработка данных JSON")),
+    ("tmux", tr("Несколько терминалов в одном окне")),
+    ("nano", tr("Простой текстовый редактор в терминале")),
+    ("neovim", tr("Расширяемый редактор кода")),
+    ("python3", tr("Язык программирования Python")),
+    ("nodejs", tr("Среда выполнения JavaScript")),
+    ("rustc", tr("Компилятор языка Rust")),
+    ("cargo", tr("Сборка проектов и зависимости Rust")),
+    ("cmake", tr("Подготовка сборки программ")),
+    ("gnumake", tr("Инструмент сборки Make")),
+    ("gdb", tr("Отладчик программ")),
+    ("shellcheck", tr("Проверка ошибок в shell-скриптах")),
+    ("strace", tr("Просмотр системных вызовов программы")),
+    ("curl", tr("Сетевые запросы и загрузка файлов")),
+    ("wget", tr("Загрузка файлов")),
+    ("btop", tr("Монитор ресурсов в терминале")),
+]
+
+def search_catalog(_):
+    dialog = Gtk.Dialog(
+        title=tr("Каталог программ"),
+        transient_for=window,
+        modal=True,
+    )
+    dialog.set_default_size(680, 420)
+    dialog.add_button(tr("Закрыть"), Gtk.ResponseType.CANCEL)
+    choose = dialog.add_button(tr("Выбрать"), Gtk.ResponseType.OK)
+    choose.set_sensitive(False)
+
+    content = dialog.get_content_area()
+    content.set_border_width(12)
+    content.set_spacing(8)
+    content.pack_start(
+        Gtk.Label(label=tr("Стартовый каталог Reval OS — не весь Nixpkgs")),
+        False, False, 0,
+    )
+
+    query = Gtk.SearchEntry()
+    query.set_placeholder_text(tr("Например: редактор, Python, процессы"))
+    content.pack_start(query, False, False, 0)
+
+    results = Gtk.ListStore(str, str)
+    listing = Gtk.TreeView(model=results)
+    for index, title in enumerate((tr("Пакет"), tr("Описание"))):
+        column = Gtk.TreeViewColumn(
+            title, Gtk.CellRendererText(), text=index
+        )
+        column.set_resizable(True)
+        listing.append_column(column)
+
+    area = Gtk.ScrolledWindow()
+    area.set_hexpand(True)
+    area.set_vexpand(True)
+    area.add(listing)
+    content.pack_start(area, True, True, 0)
+
+    def filter_catalog(*_):
+        needle = query.get_text().strip().casefold()
+        results.clear()
+        for name, description in catalog:
+            if needle in (name + " " + description).casefold():
+                results.append([name, description])
+
+    def selection_changed(selection):
+        model, iterator = selection.get_selected()
+        choose.set_sensitive(iterator is not None)
+
+    query.connect("changed", filter_catalog)
+    listing.get_selection().connect("changed", selection_changed)
+    listing.connect(
+        "row-activated",
+        lambda *_: dialog.response(Gtk.ResponseType.OK),
+    )
+    filter_catalog()
+    dialog.show_all()
+
+    if dialog.run() == Gtk.ResponseType.OK:
+        model, iterator = listing.get_selection().get_selected()
+        if iterator is not None:
+            entry.set_text(model[iterator][0])
+            status.set_text(tr("Пакет выбран. Нажми «Установить»."))
+
+    dialog.destroy()
+
+button(tr("Найти"), search_catalog)
+
+button(tr("Установить"), install)
+button(tr("Установленные"), lambda _: execute(["profile", "list"]))
+button(tr("Удалить"), remove)
+button(tr("История"), lambda _: execute(["profile", "history"]))
+button(tr("Откат"), rollback)
+
+window.show_all()
+execute(["profile", "list"])
+Gtk.main()

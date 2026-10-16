@@ -1,0 +1,54 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<openbox_menu xmlns="http://openbox.org/3.4/menu">
+  <menu id="root-menu" label="Reval OS">
+    <item label="Все приложения"><action name="Execute"><command>/home/myos/.nix-profile/bin/xfce4-appfinder</command></action></item><item label="Калькулятор"><action name="Execute"><command>/home/myos/.nix-profile/bin/galculator</command></action></item><item label="Wi-Fi"><action name="Execute"><command>/usr/bin/iwgtk</command></action></item><item label="Заблокировать экран"><action name="Execute"><command>xscreensaver-command -lock</command></action></item><item label="Настройки">
+      <action name="Execute">
+        <command>env XDG_CURRENT_DESKTOP=XFCE xfce4-settings-manager</command>
+      </action>
+    </item>
+    <item label="Браузер Firefox">
+      <action name="Execute">
+        <command>/usr/local/bin/firefox</command>
+      </action>
+    </item>
+    <item label="Редактор Mousepad">
+      <action name="Execute">
+        <command>mousepad</command>
+      </action>
+    </item>
+    <item label="Громкость">
+      <action name="Execute">
+        <command>pavucontrol</command>
+      </action>
+    </item>
+    <item label="Файлы">
+      <action name="Execute">
+        <command>thunar</command>
+      </action>
+    </item>
+    <item label="Терминал">
+      <action name="Execute">
+        <command>xterm</command>
+      </action>
+    </item>
+    <separator />
+    <item label="Обновить настройки">
+      <action name="Reconfigure" />
+    </item>
+    <item label="Выйти из рабочего стола">
+      <action name="Exit" />
+    </item>
+    <item label="Перезагрузить">
+      <action name="Execute">
+        <prompt>Перезагрузить Reval OS? Сохрани открытые документы.</prompt>
+        <command>systemctl reboot</command>
+      </action>
+    </item>
+    <item label="Выключить">
+      <action name="Execute">
+        <prompt>Выключить Reval OS? Сохрани открытые документы.</prompt>
+        <command>systemctl poweroff</command>
+      </action>
+    </item>
+  </menu>
+</openbox_menu>

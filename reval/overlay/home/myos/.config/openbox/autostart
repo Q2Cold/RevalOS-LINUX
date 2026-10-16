@@ -1,0 +1,24 @@
+
+tint2 &
+
+sh "$HOME/.fehbg" &
+
+pulseaudio --start &
+
+
+spice-vdagent &
+
+# Графический запрос административного пароля
+/usr/libexec/polkit-gnome-authentication-agent-1 > "$HOME/polkit-agent.log" 2>&1 &
+
+# Настройки темы, клавиатуры и мыши
+xfsettingsd &
+
+# Управление питанием
+xfce4-power-manager > "$HOME/power-manager.log" 2>&1 &
+
+# Блокировка экрана
+xscreensaver -no-splash > "$HOME/xscreensaver.log" 2>&1 &
+
+# Значок сети
+nm-applet > "$HOME/nm-applet.log" 2>&1 &

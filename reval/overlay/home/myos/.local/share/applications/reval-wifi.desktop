@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Application
+Name=Wi-Fi
+Comment=Подключение к беспроводным сетям через iwd
+Exec=/usr/bin/iwgtk
+Icon=network-wireless
+Terminal=false
+Categories=Settings;HardwareSettings;X-XFCE-SettingsDialog;Network;

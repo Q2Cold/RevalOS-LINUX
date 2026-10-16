@@ -1,0 +1,117 @@
+#!/bin/sh
+export PATH=/bin
+export HOME=/
+
+rescue() {
+    echo
+    echo "Reval OS Live: $*"
+    echo "Открыта аварийная оболочка."
+    exec sh
+}
+
+mount -t proc proc /proc || rescue "Не удалось подключить /proc"
+mount -t sysfs sysfs /sys || rescue "Не удалось подключить /sys"
+mount -t devtmpfs devtmpfs /dev ||
+    rescue "Не удалось подключить /dev"
+exec </dev/console >/dev/console 2>&1
+
+mount -t tmpfs -o mode=755 tmpfs /run ||
+    rescue "Не удалось подключить /run"
+
+mkdir -p /run/live/medium /run/live/lower \
+         /run/live/upper /run/live/work
+
+echo "Reval OS Live: поиск образа системы..."
+found=
+attempt=0
+
+while [ "$attempt" -lt 30 ]; do
+    for device in /dev/sr* /dev/sd* /dev/vd* \
+                  /dev/nvme*n* /dev/dm-*; do
+        [ -b "$device" ] || continue
+        if mount -t iso9660 -o ro "$device" \
+            /run/live/medium 2>/dev/null; then
+            if [ -f /run/live/medium/live/filesystem.squashfs ]; then
+                found="$device"
+                break
+            fi
+            umount /run/live/medium
+        fi
+    done
+    [ -n "$found" ] && break
+    attempt=$((attempt + 1))
+    sleep 1
+done
+
+[ -n "$found" ] || rescue "Образ системы не найден"
+echo "Reval OS Live: носитель $found"
+
+mount -t squashfs -o ro,loop \
+    /run/live/medium/live/filesystem.squashfs \
+    /run/live/lower || rescue "Не удалось подключить SquashFS"
+
+mount -t overlay overlay \
+    -o lowerdir=/run/live/lower,upperdir=/run/live/upper,workdir=/run/live/work \
+    /newroot || rescue "Не удалось подключить OverlayFS"
+
+[ -x /newroot/sbin/init ] ||
+    rescue "В системе отсутствует /sbin/init"
+
+
+# Reval OS persistence: подключение только по явному параметру загрузки
+data_uuid=
+for argument in $(cat /proc/cmdline); do
+    case "$argument" in
+        myos.data=*) data_uuid="${argument#myos.data=}" ;;
+    esac
+done
+
+if [ -n "$data_uuid" ]; then
+    command -v blkid >/dev/null ||
+        rescue "В initramfs отсутствует blkid"
+
+    mkdir -p /run/live/persistence
+    data_device=
+    for candidate in /dev/sd* /dev/vd* /dev/nvme*n* /dev/mmcblk*; do
+        [ -b "$candidate" ] || continue
+        candidate_uuid=$(blkid -s UUID -o value "$candidate" 2>/dev/null)
+        if [ "$candidate_uuid" = "$data_uuid" ]; then
+            [ -z "$data_device" ] ||
+                rescue "Найдено несколько дисков с одинаковым UUID"
+            data_device="$candidate"
+        fi
+    done
+
+    [ -n "$data_device" ] ||
+        rescue "Диск сохранения данных не найден"
+
+    mount -t ext4 -o rw "$data_device" /run/live/persistence ||
+        rescue "Не удалось подключить диск данных"
+
+    [ "$(cat /run/live/persistence/myos-data.marker 2>/dev/null)" = \
+        "MYOS persistence storage v1" ] ||
+        rescue "Неверная метка хранилища"
+
+    [ -f /run/live/persistence/copy-completed.txt ] &&
+    [ -d /run/live/persistence/home/myos ] &&
+    [ -d /run/live/persistence/nix/store ] ||
+        rescue "Копия пользовательских данных или Nix неполная"
+
+    mkdir -p /newroot/home /newroot/nix
+    mount -o bind /run/live/persistence/home /newroot/home ||
+        rescue "Не удалось подключить /home"
+    mount -o bind /run/live/persistence/nix /newroot/nix ||
+        rescue "Не удалось подключить /nix"
+
+    echo "Reval OS Live: сохранение данных включено ($data_device)"
+fi
+
+mkdir -p /newroot/dev /newroot/proc /newroot/sys /newroot/run
+
+for directory in proc sys dev run; do
+    mount --move "/$directory" "/newroot/$directory" ||
+        rescue "Не удалось перенести /$directory"
+done
+
+echo "Reval OS Live: запуск systemd..."
+exec switch_root /newroot /sbin/init
