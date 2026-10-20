@@ -1,0 +1,7 @@
+[Desktop Entry]
+Type=Application
+Name=Reval Plasma (X11)
+Comment=Reval desktop with KDE Plasma
+Exec=/usr/local/bin/reval-plasma-session
+TryExec=/usr/bin/startplasma-x11
+DesktopNames=KDE;

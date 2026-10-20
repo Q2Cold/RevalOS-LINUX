@@ -1,11 +1,7 @@
 NAME="Reval OS"
-VERSION="0.2 Universal Preview"
+PRETTY_NAME="Reval OS 0.3 Development"
 ID=reval
-ID_LIKE=lfs
-PRETTY_NAME="Reval OS 0.2 Universal Preview"
-VERSION_ID="0.2"
-VERSION_CODENAME="universal"
-BUILD_ID="preview"
+VERSION="0.3 Development"
+VERSION_ID="0.3"
 HOME_URL="https://github.com/Q2Cold/RevalOS-LINUX"
-SUPPORT_URL="https://github.com/Q2Cold/RevalOS-LINUX/issues"
 RELEASE_TYPE="development"

@@ -1,0 +1,16 @@
+#!/bin/sh
+
+export PATH="/opt/qt6/bin:/usr/local/bin:/usr/bin:/bin:$HOME/.nix-profile/bin"
+export QT_PLUGIN_PATH="/usr/lib/plugins:/opt/qt6/plugins"
+export QML_IMPORT_PATH="/usr/lib/qml:/opt/qt6/qml"
+export QML2_IMPORT_PATH="$QML_IMPORT_PATH"
+export XDG_DATA_DIRS="/usr/local/share:/usr/share:/opt/qt6/share:$HOME/.nix-profile/share"
+export XDG_CURRENT_DESKTOP=KDE
+export XDG_SESSION_DESKTOP=KDE
+export XDG_SESSION_TYPE=x11
+
+unset QT_QPA_PLATFORMTHEME QT_STYLE_OVERRIDE
+
+state_dir="${XDG_STATE_HOME:-$HOME/.local/state}/reval"
+mkdir -p "$state_dir" || exit 1
+exec /usr/bin/startplasma-x11 >"$state_dir/plasma-session.log" 2>&1
