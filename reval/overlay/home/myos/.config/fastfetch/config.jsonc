@@ -1,0 +1,33 @@
+{
+  "logo": {
+    "type": "file",
+    "source": "/home/myos/.config/fastfetch/reval-logo.txt",
+    "color": {
+      "1": "#E88CA5"
+    },
+    "padding": {
+      "right": 3
+    }
+  },
+  "modules": [
+    "title",
+    "separator",
+    "os",
+    "kernel",
+    "uptime",
+    "packages",
+    "shell",
+    "display",
+    "de",
+    "wm",
+    "terminal",
+    "cpu",
+    "gpu",
+    "memory",
+    "swap",
+    "disk",
+    "locale",
+    "break",
+    "colors"
+  ]
+}
